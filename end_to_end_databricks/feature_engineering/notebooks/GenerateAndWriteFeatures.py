@@ -81,18 +81,28 @@ pk_columns = dbutils.widgets.get("primary_keys")
 assert input_table_path != "", "input_table_path notebook parameter must be specified"
 assert output_table_name != "", "output_table_name notebook parameter must be specified"
 
-# Extract database name. Needs to be updated for Unity Catalog to the Schema name.
-output_database = output_table_name.split(".")[1]
-
 # COMMAND ----------
 
-# DBTITLE 1,Create database.
-spark.sql("CREATE DATABASE IF NOT EXISTS " + output_database)
+# DBTITLE 1, Ensure Unity Catalog schema exists (or Hive database for legacy two-part names).
+name_parts = output_table_name.split(".")
+if len(name_parts) >= 3:
+    _catalog, _schema = name_parts[0], name_parts[1]
+    spark.sql(f"CREATE SCHEMA IF NOT EXISTS {_catalog}.{_schema}")
+elif len(name_parts) == 2:
+    spark.sql("CREATE DATABASE IF NOT EXISTS " + name_parts[0])
+else:
+    raise ValueError(
+        f"output_table_name must be catalog.schema.table or database.table, got: {output_table_name}"
+    )
 
 # COMMAND ----------
 
 # DBTITLE 1, Read input data.
-raw_data = spark.read.format("delta").load(input_table_path)
+# DBFS sample paths need the dbfs: scheme for .load() in many runtimes.
+_delta_path = input_table_path
+if _delta_path.startswith("/databricks-datasets"):
+    _delta_path = "dbfs:" + _delta_path
+raw_data = spark.read.format("delta").load(_delta_path)
 
 # COMMAND ----------
 

@@ -13,7 +13,7 @@ resources:
             notebook_path: ../feature_engineering/notebooks/GenerateAndWriteFeatures.py
             base_parameters:
               # TODO modify these arguments to reflect your setup.
-              input_table_path: /databricks-datasets/nyctaxi-with-zipcodes/subsampled
+              input_table_path: dbfs:/databricks-datasets/nyctaxi-with-zipcodes/subsampled
               # TODO: Empty start/end dates will process the whole range. Update this as needed to process recent data.
               input_start_date: ""
               input_end_date: ""
@@ -26,7 +26,7 @@ resources:
             notebook_path: ../feature_engineering/notebooks/GenerateAndWriteFeatures.py
             base_parameters:
               # TODO: modify these arguments to reflect your setup.
-              input_table_path: /databricks-datasets/nyctaxi-with-zipcodes/subsampled
+              input_table_path: dbfs:/databricks-datasets/nyctaxi-with-zipcodes/subsampled
               # TODO: Empty start/end dates will process the whole range. Update this as needed to process recent data.
               input_start_date: ""
               input_end_date: ""
