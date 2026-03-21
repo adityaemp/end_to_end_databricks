@@ -1,5 +1,5 @@
-# Lakehouse Monitoring: requires Unity Catalog tables (predictions) to exist in each catalog.
-# See https://docs.databricks.com/aws/en/lakehouse-monitoring/
+# Retraining / monitoring jobs. Optional Lakehouse quality monitor: see
+# monitoring-quality-monitor-resource.yml and databricks.yml include.
 
 common_permissions: &permissions
   permissions:
@@ -7,23 +7,6 @@ common_permissions: &permissions
       group_name: users
 
 resources:
-  quality_monitors:
-    end_to_end_databricks_quality_monitor:
-      table_name: ${var.catalog_name}.end_to_end_databricks.predictions
-      output_schema_name: ${var.catalog_name}.end_to_end_databricks
-      # TODO: Update the below parameters as per your requirements
-      assets_dir: /Users/${workspace.current_user.userName}/databricks_lakehouse_monitoring
-      inference_log:
-        granularities: [1 day]
-        # Must match columns written by deployment/batch_inference/predict.py and the training label.
-        model_id_col: model_id
-        prediction_col: prediction
-        label_col: fare_amount
-        problem_type: PROBLEM_TYPE_REGRESSION
-        timestamp_col: timestamp
-      schedule:
-        quartz_cron_expression: 0 0 8 * * ? # Run Every day at 8am
-        timezone_id: UTC
   jobs:
     retraining_job:
       name: ${bundle.target}-end_to_end_databricks-monitoring-retraining-job

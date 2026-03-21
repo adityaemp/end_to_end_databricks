@@ -35,6 +35,9 @@ include:
   - ./resources/sensor-streaming-workflow-resource.yml
   - ./resources/dlt-sensor-streaming-pipeline.yml
   - ./resources/monitoring-resource.yml
+  # Optional: uncomment after predictions table has columns model_id, prediction, fare_amount, timestamp
+  # (see sql/create_predictions_tables.sql). Otherwise terraform may fail creating the monitor.
+  # - ./resources/monitoring-quality-monitor-resource.yml
 
 # Deployment Target specific values for workspace
 targets:

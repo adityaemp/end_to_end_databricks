@@ -1,0 +1,20 @@
+# Lakehouse quality monitor (optional). Deploy can fail if the predictions table is missing
+# required columns — run sql/create_predictions_tables.sql (or batch inference) first, then
+# add the include in databricks.yml.
+
+resources:
+  quality_monitors:
+    end_to_end_databricks_quality_monitor:
+      table_name: ${var.catalog_name}.end_to_end_databricks.predictions
+      output_schema_name: ${var.catalog_name}.end_to_end_databricks
+      assets_dir: /Users/${workspace.current_user.userName}/databricks_lakehouse_monitoring
+      inference_log:
+        granularities: [1 day]
+        model_id_col: model_id
+        prediction_col: prediction
+        label_col: fare_amount
+        problem_type: PROBLEM_TYPE_REGRESSION
+        timestamp_col: timestamp
+      schedule:
+        quartz_cron_expression: 0 0 8 * * ? # Run Every day at 8am
+        timezone_id: UTC
