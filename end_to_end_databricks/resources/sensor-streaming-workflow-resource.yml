@@ -20,17 +20,13 @@ resources:
         - job_cluster_key: sensor_streaming_job_cluster
           <<: *new_cluster
       tasks:
-        - task_key: BronzeToSilver
+        - task_key: TriggerDLTPipeline
           job_cluster_key: sensor_streaming_job_cluster
-          notebook_task:
-            notebook_path: ../feature_engineering/notebooks/SensorStreamingIngest.py
-            base_parameters:
-              bronze_path: /tmp/end_to_end_databricks/bronze/sensor_data
-              silver_path: /tmp/end_to_end_databricks/silver/sensor_data
-              gold_path: /tmp/end_to_end_databricks/gold/sensor_data
-              checkpoint_base: /tmp/end_to_end_databricks/checkpoints/sensor_stream
-              # git source info
-              git_source_info: url:${bundle.git.origin_url}; branch:${bundle.git.branch}; commit:${bundle.git.commit}
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.sensor_streaming_dlt_pipeline.id}
+            full_refresh: false
+          # git source info
+          git_source_info: url:${bundle.git.origin_url}; branch:${bundle.git.branch}; commit:${bundle.git.commit}
       schedule:
         quartz_cron_expression: "0 0/10 * * * ?" # every 10 minutes for continuous processing
         timezone_id: UTC

@@ -1,0 +1,29 @@
+common_permissions: &permissions
+  permissions:
+    - level: CAN_VIEW
+      group_name: users
+
+resources:
+  pipelines:
+    sensor_streaming_dlt_pipeline:
+      name: ${bundle.target}-sensor-streaming-dlt-pipeline
+      libraries:
+        - notebook:
+            path: ../feature_engineering/notebooks/SensorStreamingDLT.py
+      configuration:
+        bundle.sourcePath: ${bundle.git.origin_url}
+        bundle.sourceBranch: ${bundle.git.branch}
+        bundle.sourceCommit: ${bundle.git.commit}
+      clusters:
+        - label: default
+          num_workers: 4
+          spark_version: 15.3.x-cpu-ml-scala2.12
+          node_type_id: i3.xlarge
+          data_security_mode: "SINGLE_USER"
+          custom_tags:
+            clusterSource: mlops-stacks_sensor_dlt
+      continuous: true
+      development: true
+      channel: PREVIEW
+      photon: true
+      <<: *permissions

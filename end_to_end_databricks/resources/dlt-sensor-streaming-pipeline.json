@@ -1,0 +1,26 @@
+{
+  "name": "${bundle.target}-end_to_end_databricks-sensor-streaming-dlt",
+  "storage": "dbfs:/pipelines/end_to_end_databricks/sensor_streaming_dlt",
+  "target": "${bundle.target}",
+  "target_catalog": "${var.catalog_name}",
+  "target_schema": "end_to_end_databricks",
+  "continuous": true,
+  "delivery_stream": "",
+  "clusters": [
+    {
+      "label": "dlt-sensor-streaming",
+      "num_workers": 3,
+      "spark_version": "15.3.x-cpu-ml-scala2.12",
+      "node_type_id": "i3.xlarge",
+      "data_security_mode": "SINGLE_USER"
+    }
+  ],
+  "libraries": [
+    {
+      "whl": "dbfs:/FileStore/jars/databricks-feature-store-1.0-py3-none-any.whl"
+    }
+  ],
+  "notebook_task": {
+    "notebook_path": "../feature_engineering/dlt/sensor_streaming_dlt.py"
+  }
+}

@@ -22,8 +22,12 @@ notebook_path = '/Workspace/' + os.path.dirname(dbutils.notebook.entry_point.get
 
 # COMMAND ----------
 
+import logging
 from pyspark.sql import functions as F
 from pyspark.sql.types import IntegerType, DoubleType
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger('SensorStreamingIngest')
 
 bronze_path = dbutils.widgets.get('bronze_path') if dbutils.widgets.get('bronze_path') else '/tmp/end_to_end_databricks/bronze/sensor_data'
 silver_path = dbutils.widgets.get('silver_path') if dbutils.widgets.get('silver_path') else '/tmp/end_to_end_databricks/silver/sensor_data'
