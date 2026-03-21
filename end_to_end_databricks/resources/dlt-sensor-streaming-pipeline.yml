@@ -20,4 +20,5 @@ resources:
       development: true
       channel: PREVIEW
       photon: true
+      serverless: true
       <<: *permissions
