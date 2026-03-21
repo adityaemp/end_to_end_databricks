@@ -23,6 +23,7 @@ include:
   - ./resources/ml-artifacts-resource.yml
   - ./resources/model-workflow-resource.yml
   - ./resources/feature-engineering-workflow-resource.yml
+  - ./resources/sensor-streaming-workflow-resource.yml
   # TODO: uncomment once monitoring inference table has been created
   # - ./resources/monitoring-resource.yml
 

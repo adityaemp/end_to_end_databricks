@@ -16,10 +16,9 @@ This project contains the following components:
 
 | Component                  | Description                                                                                                                                                                                                                                                                                                                                             |
 |----------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| ML Code                    | Example ML project code, with unit tested Python modules and notebooks                                                                                                                                                                                                                                                                             |
-| ML Resources as Code | ML pipeline resources (training and batch inference jobs with schedules, etc) configured and deployed through [databricks CLI bundles](https://docs.databricks.com/dev-tools/cli/bundle-cli.html)                                                                                              |
-| CI/CD                      | [GitHub Actions](https://github.com/actions) workflows  to test and deploy ML code and resources
-                                |
+| ML Code                    | Example ML project code, with unit tested Python modules and notebooks; extended with sensor streaming source and medallion ETL.                                                                                                                                                                                                                               |
+| ML Resources as Code | ML pipeline resources (training and batch inference jobs with schedules, etc) configured and deployed through [databricks CLI bundles](https://docs.databricks.com/dev-tools/cli/bundle-cli.html); includes `sensor-streaming-workflow-resource.yml` for bronze/silver/gold pipelines.                                                                                              |
+| CI/CD                      | [GitHub Actions](https://github.com/actions) workflows  to test and deploy ML code and resources; includes `sensor-mlops.yml` for end-to-end pipeline deployment and run. |
 
 contained in the following files:
 

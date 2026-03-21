@@ -1,0 +1,49 @@
+name: Sensor Streaming MLOps
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  DATABRICKS_HOST: https://dbc-314d456b-c68f.cloud.databricks.com
+  DATABRICKS_TOKEN: ${{ secrets.STAGING_WORKSPACE_TOKEN }}
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r end_to_end_databricks/requirements.txt
+
+      - name: Run unit tests
+        run: |
+          pytest -q end_to_end_databricks/tests
+
+  deploy:
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: databricks/setup-cli@v0.236.0
+
+      - name: Deploy databricks resources
+        run: |
+          # validate bundle structure
+          databricks bundle schema -f end_to_end_databricks/databricks.yml
+          # deploy all resource workflows to staging
+          databricks bundle deploy --bundle end_to_end_databricks --target staging
+
+      - name: Trigger model training workflow
+        run: |
+          JOB_ID=$(databricks jobs list --output JSON | jq -r '.jobs[] | select(.settings.name=="staging-sensor-streaming-etl-job") | .job_id')
+          databricks jobs run-now --job-id ${JOB_ID}

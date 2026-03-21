@@ -1,0 +1,37 @@
+new_cluster: &new_cluster
+  new_cluster:
+    num_workers: 4
+    spark_version: 15.3.x-cpu-ml-scala2.12
+    node_type_id: i3.xlarge
+    data_security_mode: "SINGLE_USER"
+    custom_tags:
+      clusterSource: mlops-stacks_sensor_stream
+
+common_permissions: &permissions
+  permissions:
+    - level: CAN_VIEW
+      group_name: users
+
+resources:
+  jobs:
+    sensor_streaming_job:
+      name: ${bundle.target}-sensor-streaming-etl-job
+      job_clusters:
+        - job_cluster_key: sensor_streaming_job_cluster
+          <<: *new_cluster
+      tasks:
+        - task_key: BronzeToSilver
+          job_cluster_key: sensor_streaming_job_cluster
+          notebook_task:
+            notebook_path: ../feature_engineering/notebooks/SensorStreamingIngest.py
+            base_parameters:
+              bronze_path: /tmp/end_to_end_databricks/bronze/sensor_data
+              silver_path: /tmp/end_to_end_databricks/silver/sensor_data
+              gold_path: /tmp/end_to_end_databricks/gold/sensor_data
+              checkpoint_base: /tmp/end_to_end_databricks/checkpoints/sensor_stream
+              # git source info
+              git_source_info: url:${bundle.git.origin_url}; branch:${bundle.git.branch}; commit:${bundle.git.commit}
+      schedule:
+        quartz_cron_expression: "0 0/10 * * * ?" # every 10 minutes for continuous processing
+        timezone_id: UTC
+      <<: *permissions
