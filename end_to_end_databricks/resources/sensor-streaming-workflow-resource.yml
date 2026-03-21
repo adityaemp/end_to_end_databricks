@@ -1,11 +1,6 @@
 new_cluster: &new_cluster
   new_cluster:
-    num_workers: 4
-    spark_version: 15.3.x-cpu-ml-scala2.12
-    node_type_id: i3.xlarge
-    data_security_mode: "SINGLE_USER"
-    custom_tags:
-      clusterSource: mlops-stacks_sensor_stream
+    serverless: true
 
 common_permissions: &permissions
   permissions:
@@ -15,18 +10,12 @@ common_permissions: &permissions
 resources:
   jobs:
     sensor_streaming_job:
-      name: ${bundle.target}-sensor-streaming-etl-job
-      job_clusters:
-        - job_cluster_key: sensor_streaming_job_cluster
-          <<: *new_cluster
+      name: ${bundle.target}-end_to_end_databricks-sensor-streaming-etl-job
       tasks:
         - task_key: TriggerDLTPipeline
-          job_cluster_key: sensor_streaming_job_cluster
           pipeline_task:
             pipeline_id: ${resources.pipelines.sensor_streaming_dlt_pipeline.id}
             full_refresh: false
-          # git source info
-          git_source_info: url:${bundle.git.origin_url}; branch:${bundle.git.branch}; commit:${bundle.git.commit}
       schedule:
         quartz_cron_expression: "0 0/10 * * * ?" # every 10 minutes for continuous processing
         timezone_id: UTC

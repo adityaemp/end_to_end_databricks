@@ -39,8 +39,7 @@ targets:
     variables:
       catalog_name: dev
     workspace:
-      # TODO: add dev workspace URL
-      host:
+      host: https://dbc-314d456b-c68f.cloud.databricks.com
 
   staging:
     variables:

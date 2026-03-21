@@ -1,11 +1,6 @@
 new_cluster: &new_cluster
   new_cluster:
-    num_workers: 3
-    spark_version: 15.3.x-cpu-ml-scala2.12
-    node_type_id: i3.xlarge
-    data_security_mode: "SINGLE_USER"
-    custom_tags:
-      clusterSource: mlops-stacks_0.4
+    serverless: true
 
 common_permissions: &permissions
   permissions:
@@ -16,12 +11,8 @@ resources:
   jobs:
     write_feature_table_job:
       name: ${bundle.target}-end_to_end_databricks-write-feature-table-job
-      job_clusters:
-        - job_cluster_key: write_feature_table_job_cluster
-          <<: *new_cluster
       tasks:
         - task_key: PickupFeatures
-          job_cluster_key: write_feature_table_job_cluster
           notebook_task:
             notebook_path: ../feature_engineering/notebooks/GenerateAndWriteFeatures.py
             base_parameters:
@@ -34,10 +25,7 @@ resources:
               output_table_name: ${var.catalog_name}.end_to_end_databricks.trip_pickup_features
               features_transform_module: pickup_features
               primary_keys: zip
-              # git source information of current ML resource deployment. It will be persisted as part of the workflow run
-              git_source_info: url:${bundle.git.origin_url}; branch:${bundle.git.branch}; commit:${bundle.git.commit}
         - task_key: DropoffFeatures
-          job_cluster_key: write_feature_table_job_cluster
           notebook_task:
             notebook_path: ../feature_engineering/notebooks/GenerateAndWriteFeatures.py
             base_parameters:
@@ -50,8 +38,6 @@ resources:
               output_table_name: ${var.catalog_name}.end_to_end_databricks.trip_dropoff_features
               features_transform_module: dropoff_features
               primary_keys: zip
-              # git source information of current ML resource deployment. It will be persisted as part of the workflow run
-              git_source_info: url:${bundle.git.origin_url}; branch:${bundle.git.branch}; commit:${bundle.git.commit}
       schedule:
         quartz_cron_expression: "0 0 7 * * ?" # daily at 7am
         timezone_id: UTC

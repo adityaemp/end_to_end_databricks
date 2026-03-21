@@ -4,10 +4,7 @@
 
 new_cluster: &new_cluster
   new_cluster:
-    num_workers: 3
-    spark_version: 15.3.x-cpu-ml-scala2.12
-    node_type_id: i3.xlarge
-    data_security_mode: "SINGLE_USER"
+    serverless: true
     custom_tags:
       clusterSource: mlops-stacks_0.4
 
@@ -50,8 +47,6 @@ resources:
               metric_violation_threshold: 100
               num_evaluation_windows: 5
               num_violation_windows: 2
-              # git source information of current ML resource deployment. It will be persisted as part of the workflow run
-              git_source_info: url:${bundle.git.origin_url}; branch:${bundle.git.branch}; commit:${bundle.git.commit}
 
         - task_key: is_metric_violated
           depends_on:
@@ -60,7 +55,6 @@ resources:
             op: EQUAL_TO
             left: "{{tasks.monitored_metric_violation_check.values.is_metric_violated}}"
             right: "true"
-          git_source_info: url:${bundle.git.origin_url}; branch:${bundle.git.branch}; commit:${bundle.git.commit}
 
         - task_key: trigger_retraining
           depends_on:
@@ -68,7 +62,6 @@ resources:
               outcome: "true"
           run_job_task:
             job_id: ${resources.jobs.model_training_job.id}
-            git_source_info: url:${bundle.git.origin_url}; branch:${bundle.git.branch}; commit:${bundle.git.commit}
 
       schedule:
         quartz_cron_expression: "0 0 18 * * ?" # daily at 6pm

@@ -7,18 +7,22 @@
 # Gold: Feature table for ML training
 ##################################################################################
 
+# Bronze Layer: Raw sensor stream
+# CREATE TEMPORARY STREAMING TABLE bronze_sensor_data
+# COMMENT "Raw sensor streaming data with basic schema enforcement"
+# AS SELECT * FROM STREAM(cloud_files("/databricks-datasets/structured-streaming/events", "json"))
+
+# For synthetic data, we'll use Python
 import dlt
 from pyspark.sql.functions import *
 from pyspark.sql.types import *
 
 # Bronze Layer: Raw sensor stream
+# Note: Using temporary=True to avoid requiring target_schema
 @dlt.table(
     name="bronze_sensor_data",
     comment="Raw sensor streaming data with basic schema enforcement",
-    table_properties={
-        "quality": "bronze",
-        "pipelines.reset.allowed": "true"
-    }
+    temporary=True
 )
 def bronze_sensor_data():
     # Generate synthetic sensor data stream
@@ -59,10 +63,7 @@ def bronze_sensor_data():
 @dlt.table(
     name="silver_sensor_data",
     comment="Cleaned sensor data with anomaly filtering and 5-minute aggregations",
-    table_properties={
-        "quality": "silver",
-        "pipelines.reset.allowed": "true"
-    }
+    temporary=True
 )
 @dlt.expect_or_drop("valid_temperature", "temperature BETWEEN -5 AND 80")
 @dlt.expect_or_drop("valid_humidity", "humidity BETWEEN 0 AND 100")
@@ -95,10 +96,7 @@ def silver_sensor_data():
 @dlt.table(
     name="gold_sensor_features",
     comment="Hourly aggregated sensor features for ML training",
-    table_properties={
-        "quality": "gold",
-        "pipelines.reset.allowed": "true"
-    }
+    temporary=True
 )
 def gold_sensor_features():
     return (

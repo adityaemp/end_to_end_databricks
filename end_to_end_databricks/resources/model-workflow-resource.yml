@@ -1,11 +1,6 @@
 new_cluster: &new_cluster
   new_cluster:
-    num_workers: 3
-    spark_version: 15.3.x-cpu-ml-scala2.12
-    node_type_id: i3.xlarge
-    data_security_mode: "SINGLE_USER"
-    custom_tags:
-      clusterSource: mlops-stacks_0.4
+    serverless: true
 
 common_permissions: &permissions
   permissions:
@@ -16,12 +11,8 @@ resources:
   jobs:
     model_training_job:
       name: ${bundle.target}-end_to_end_databricks-model-training-job
-      job_clusters:
-        - job_cluster_key: model_training_job_cluster
-          <<: *new_cluster
       tasks:
         - task_key: Train
-          job_cluster_key: model_training_job_cluster
           notebook_task:
             notebook_path: ../training/notebooks/TrainWithFeatureStore.py
             base_parameters:
@@ -32,10 +23,7 @@ resources:
               model_name: ${var.catalog_name}.end_to_end_databricks.${var.model_name}
               pickup_features_table: ${var.catalog_name}.end_to_end_databricks.trip_pickup_features
               dropoff_features_table: ${var.catalog_name}.end_to_end_databricks.trip_dropoff_features
-              # git source information of current ML resource deployment. It will be persisted as part of the workflow run
-              git_source_info: url:${bundle.git.origin_url}; branch:${bundle.git.branch}; commit:${bundle.git.commit}
         - task_key: ModelValidation
-          job_cluster_key: model_training_job_cluster
           depends_on:
             - task_key: Train
           notebook_task:
@@ -75,18 +63,13 @@ resources:
               # Specifies the name of the function in end_to_end_databricks/training_validation_deployment/validation/validation.py that returns evaluator_config.
               # TODO(optional): evaluator_config_loader_function
               evaluator_config_loader_function: evaluator_config
-              # git source information of current ML resource deployment. It will be persisted as part of the workflow run
-              git_source_info: url:${bundle.git.origin_url}; branch:${bundle.git.branch}; commit:${bundle.git.commit}
         - task_key: ModelDeployment
-          job_cluster_key: model_training_job_cluster
           depends_on:
             - task_key: ModelValidation
           notebook_task:
             notebook_path: ../deployment/model_deployment/notebooks/ModelDeployment.py
             base_parameters:
               env: ${bundle.target}
-              # git source information of current ML resource deployment. It will be persisted as part of the workflow run
-              git_source_info: url:${bundle.git.origin_url}; branch:${bundle.git.branch}; commit:${bundle.git.commit}
       schedule:
         quartz_cron_expression: "0 0 9 * * ?" # daily at 9am
         timezone_id: UTC
