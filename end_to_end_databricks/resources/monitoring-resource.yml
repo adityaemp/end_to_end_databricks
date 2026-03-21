@@ -15,9 +15,10 @@ resources:
       assets_dir: /Users/${workspace.current_user.userName}/databricks_lakehouse_monitoring
       inference_log:
         granularities: [1 day]
+        # Must match columns written by deployment/batch_inference/predict.py and the training label.
         model_id_col: model_id
         prediction_col: prediction
-        label_col: price
+        label_col: fare_amount
         problem_type: PROBLEM_TYPE_REGRESSION
         timestamp_col: timestamp
       schedule:
