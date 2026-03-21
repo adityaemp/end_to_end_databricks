@@ -8,8 +8,7 @@ resources:
     sensor_streaming_dlt_pipeline:
       name: ${bundle.target}-sensor-streaming-dlt-pipeline
       catalog: ${var.catalog_name}
-      target_schema: ${var.schema_name}
-      serverless: true
+      target: ${var.schema_name}
       libraries:
         - notebook:
             path: ../feature_engineering/notebooks/SensorStreamingDLT.py
