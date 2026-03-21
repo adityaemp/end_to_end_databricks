@@ -32,19 +32,33 @@ jobs:
   deploy:
     needs: validate
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: end_to_end_databricks
     steps:
       - uses: actions/checkout@v4
       - uses: databricks/setup-cli@v0.236.0
 
-      - name: Deploy databricks resources
+      - name: Validate and deploy bundle
+        env:
+          DATABRICKS_HOST: ${{ env.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ env.DATABRICKS_TOKEN }}
         run: |
-          databricks bundle schema -f end_to_end_databricks/databricks.yml
-          # Deploy to test environment for validation
-          databricks bundle deploy --bundle end_to_end_databricks --target test
-          # Deploy to staging for production-like testing
-          databricks bundle deploy --bundle end_to_end_databricks --target staging
+          set -euo pipefail
+          databricks bundle validate -t test
+          databricks bundle deploy -t test
+          databricks bundle validate -t staging
+          databricks bundle deploy -t staging
 
-      - name: Trigger model training workflow
+      - name: Trigger sensor streaming job (staging)
+        env:
+          DATABRICKS_HOST: ${{ env.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ env.DATABRICKS_TOKEN }}
         run: |
+          set -euo pipefail
           JOB_ID=$(databricks jobs list --output JSON | jq -r '.jobs[] | select(.settings.name=="staging-end_to_end_databricks-sensor-streaming-etl-job") | .job_id')
-          databricks jobs run-now --job-id ${JOB_ID}
+          if [ -z "$JOB_ID" ] || [ "$JOB_ID" = "null" ]; then
+            echo "Job staging-end_to_end_databricks-sensor-streaming-etl-job not found; skip run-now."
+            exit 0
+          fi
+          databricks jobs run-now --job-id "$JOB_ID"

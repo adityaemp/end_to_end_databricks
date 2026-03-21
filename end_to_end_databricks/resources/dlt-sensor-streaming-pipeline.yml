@@ -17,8 +17,8 @@ resources:
         bundle.sourceBranch: ${bundle.git.branch}
         bundle.sourceCommit: ${bundle.git.commit}
       continuous: true
-      development: true
-      channel: PREVIEW
+      development: ${var.dlt_development}
+      channel: ${var.dlt_channel}
       photon: true
       serverless: true
       <<: *permissions

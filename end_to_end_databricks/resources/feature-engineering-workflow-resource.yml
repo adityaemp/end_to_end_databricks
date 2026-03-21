@@ -1,7 +1,3 @@
-new_cluster: &new_cluster
-  new_cluster:
-    serverless: true
-
 common_permissions: &permissions
   permissions:
     - level: CAN_VIEW

@@ -1,12 +1,5 @@
-# Please complete all the TODOs in this file.
-# The regression monitor defined here works OOB with this example regression notebook: https://docs.databricks.com/_extras/notebooks/source/monitoring/regression-monitor.html
-# NOTE: Monitoring only works on Unity Catalog tables.
-
-new_cluster: &new_cluster
-  new_cluster:
-    serverless: true
-    custom_tags:
-      clusterSource: mlops-stacks_0.4
+# Lakehouse Monitoring: requires Unity Catalog tables (predictions) to exist in each catalog.
+# See https://docs.databricks.com/aws/en/lakehouse-monitoring/
 
 common_permissions: &permissions
   permissions:
@@ -16,9 +9,8 @@ common_permissions: &permissions
 resources:
   quality_monitors:
     end_to_end_databricks_quality_monitor:
-      table_name: dev.end_to_end_databricks.predictions
-      # TODO: Update the output schema name as per your requirements
-      output_schema_name: ${bundle.target}.end_to_end_databricks
+      table_name: ${var.catalog_name}.end_to_end_databricks.predictions
+      output_schema_name: ${var.catalog_name}.end_to_end_databricks
       # TODO: Update the below parameters as per your requirements
       assets_dir: /Users/${workspace.current_user.userName}/databricks_lakehouse_monitoring
       inference_log:
@@ -36,12 +28,11 @@ resources:
       name: ${bundle.target}-end_to_end_databricks-monitoring-retraining-job
       tasks:
         - task_key: monitored_metric_violation_check
-          <<: *new_cluster
           notebook_task:
             notebook_path: ../monitoring/notebooks/MonitoredMetricViolationCheck.py
             base_parameters:
               env: ${bundle.target}
-              table_name_under_monitor: dev.end_to_end_databricks.predictions
+              table_name_under_monitor: ${var.catalog_name}.end_to_end_databricks.predictions
               # TODO: Update the metric to be monitored and violation threshold
               metric_to_monitor: root_mean_squared_error
               metric_violation_threshold: 100

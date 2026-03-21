@@ -17,7 +17,13 @@ variables:
   schema_name:
     description: The schema name for all tables
     default: end_to_end_databricks
-    
+  dlt_development:
+    description: DLT development mode (use false for staging/prod — isolated reset behavior is dev-only).
+    default: false
+  dlt_channel:
+    description: Delta Live Tables channel (CURRENT for production stability).
+    default: CURRENT
+
 include:
   # Resources folder contains ML artifact resources for the ML project that defines model and experiment
   # And workflows resources for the ML project including model training -> validation -> deployment,
@@ -28,8 +34,7 @@ include:
   - ./resources/feature-engineering-workflow-resource.yml
   - ./resources/sensor-streaming-workflow-resource.yml
   - ./resources/dlt-sensor-streaming-pipeline.yml
-  # TODO: uncomment once monitoring inference table has been created
-  # - ./resources/monitoring-resource.yml
+  - ./resources/monitoring-resource.yml
 
 # Deployment Target specific values for workspace
 targets:
@@ -38,6 +43,8 @@ targets:
     default: true
     variables:
       catalog_name: dev
+      dlt_development: true
+      dlt_channel: PREVIEW
     workspace:
       host: https://dbc-314d456b-c68f.cloud.databricks.com
 
