@@ -7,7 +7,7 @@ bundle:
 variables:
   experiment_name:
     description: Experiment name for the model training.
-    default: /Users/${workspace.current_user.userName}/${bundle.target}-end_to_end_databricks-experiment
+    default: /Users/${workspace.current_user.userName}/end_to_end_databricks-experiment
   model_name:
     description: Model name for the model training.
     default: end_to_end_databricks-model
@@ -48,7 +48,7 @@ targets:
       dlt_development: true
       dlt_channel: PREVIEW
     presets:
-      name_prefix: dev_${workspace.current_user.short_name}
+      name_prefix: dev_${workspace.current_user.short_name}_
       source_linked_deployment: false
     workspace:
       host: https://dbc-314d456b-c68f.cloud.databricks.com
@@ -57,7 +57,7 @@ targets:
     variables:
       catalog_name: staging
     presets:
-      name_prefix: staging_${workspace.current_user.short_name}
+      name_prefix: staging_${workspace.current_user.short_name}_
       source_linked_deployment: false
     workspace:
       host: https://dbc-314d456b-c68f.cloud.databricks.com
@@ -66,19 +66,19 @@ targets:
     variables:
       catalog_name: prod
     presets:
-      name_prefix: prod_${workspace.current_user.short_name}
+      name_prefix: prod_${workspace.current_user.short_name}_
       source_linked_deployment: false
     workspace:
       host: https://dbc-314d456b-c68f.cloud.databricks.com
-    permissions:
-      - group_name: admins
-        level: can_manage
+    # permissions:
+    #   - group_name: admins
+    #     level: can_manage
 
   test:
     variables:
       catalog_name: test
     presets:
-      name_prefix: test_${workspace.current_user.short_name}
+      name_prefix: test_${workspace.current_user.short_name}_
       source_linked_deployment: false
     workspace:
       host: https://dbc-314d456b-c68f.cloud.databricks.com
