@@ -8,6 +8,9 @@ on:
   push:
     branches:
       - 'main'
+    paths:
+      - 'end_to_end_databricks/**'
+      - '.github/workflows/end_to_end_databricks-bundle-cd-staging.yml'
   workflow_dispatch:
 
 defaults:
@@ -15,6 +18,7 @@ defaults:
     working-directory: ./end_to_end_databricks
 
 env:
+  DATABRICKS_HOST: https://dbc-314d456b-c68f.cloud.databricks.com
   DATABRICKS_TOKEN: ${{ secrets.STAGING_WORKSPACE_TOKEN }}
 
 jobs:

@@ -1,6 +1,10 @@
 # This GitHub workflow sets up CI/CD workflows for a previously instantiated MLOps Stacks Project.
 name: Deploy CICD for Project Workflow
 
+permissions:
+  contents: write
+  pull-requests: write
+
 on:
   workflow_dispatch:
     inputs:
@@ -47,7 +51,7 @@ jobs:
       - name: Update databricks.yml
         id: update
         run: |
-          echo -e "  staging:\n    variables:\n      catalog_name: staging\n    workspace:\n      host: https://dbc-314d456b-c68f.cloud.databricks.com\n\n  prod:\n    variables:\n      catalog_name: prod\n    workspace:\n      host: https://dbc-314d456b-c68f.cloud.databricks.com\n\n  test:\n    variables:\n      catalog_name: test\n    workspace:\n      host: https://dbc-314d456b-c68f.cloud.databricks.com" >> "$(PROJECT_NAME_ALPHA)\databricks.yml"
+          echo -e "  staging:\n    variables:\n      catalog_name: staging\n    workspace:\n      host: https://dbc-314d456b-c68f.cloud.databricks.com\n\n  prod:\n    variables:\n      catalog_name: prod\n    workspace:\n      host: https://dbc-314d456b-c68f.cloud.databricks.com\n\n  test:\n    variables:\n      catalog_name: test\n    workspace:\n      host: https://dbc-314d456b-c68f.cloud.databricks.com" >> "${PROJECT_NAME_ALPHA}/databricks.yml"
       - name: Initialize Bundle
         id: initialize
         run: |

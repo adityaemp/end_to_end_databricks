@@ -3,6 +3,10 @@
 # and end_to_end_databricks/databricks.yml on pull requests and on every push to main.
 name: Bundle validation for end_to_end_databricks
 
+permissions:
+  contents: read
+  pull-requests: write
+
 on:
   workflow_dispatch:
   push:
@@ -21,6 +25,7 @@ defaults:
     working-directory: ./end_to_end_databricks/
 
 env:
+  DATABRICKS_HOST: https://dbc-314d456b-c68f.cloud.databricks.com
   STAGING_WORKSPACE_TOKEN: ${{ secrets.STAGING_WORKSPACE_TOKEN }}
   PROD_WORKSPACE_TOKEN: ${{ secrets.PROD_WORKSPACE_TOKEN }}
 

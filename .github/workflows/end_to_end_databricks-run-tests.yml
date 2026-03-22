@@ -40,6 +40,12 @@ jobs:
   integration_test:
     needs: unit_tests
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./end_to_end_databricks
+    env:
+      DATABRICKS_HOST: https://dbc-314d456b-c68f.cloud.databricks.com
+      DATABRICKS_TOKEN: ${{ secrets.STAGING_WORKSPACE_TOKEN }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
